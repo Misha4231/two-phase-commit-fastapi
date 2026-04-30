@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres
+    env_file:
+      .env
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    restart: always
+  
+  api:
+    build: .
+    env_file:
+      .env
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    develop:
+      watch:
+        - path: ./user_service
+          action: sync
+          target: /app/user_service
+        
+        - path: ./user_service
+          action: rebuild
+          target: /app/user_service
+        
+        - path: ./pyproject.toml
+          action: rebuild
+    working_dir: /app
+    volumes:
+      - ./migrations:/app/migrations
+      - ./migrations/versions:/app/migrations/versions
+    command: >
+      sh -c "
+        ./wait-for-db.sh &&
+        uvicorn user_service.main:app --host 0.0.0.0 --port 8000
+      "
+
+volumes:
+  postgres_data:
