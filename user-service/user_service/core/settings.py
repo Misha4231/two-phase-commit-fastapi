@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings
 
+
 # Reads from environment variables
 class Settings(BaseSettings):
     postgres_user: str

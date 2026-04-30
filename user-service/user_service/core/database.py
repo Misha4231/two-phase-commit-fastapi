@@ -14,18 +14,16 @@ DATABASE_URL = URL.create(
     port=settings.postgres_port,
     database=settings.postgres_db,
 )
-engine = create_async_engine(
-    DATABASE_URL,
-    isolation_level="REPEATABLE READ"
-)
+engine = create_async_engine(DATABASE_URL, isolation_level="REPEATABLE READ")
 
 AsyncSessionLocal = sessionmaker(
     autoflush=False,
     autocommit=False,
     expire_on_commit=False,
     bind=engine,
-    class_=AsyncSession
+    class_=AsyncSession,
 )
+
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:

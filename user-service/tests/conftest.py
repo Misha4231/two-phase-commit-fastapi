@@ -3,7 +3,12 @@ import os
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker, AsyncEngine
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    create_async_engine,
+    async_sessionmaker,
+    AsyncEngine,
+)
 from sqlalchemy import NullPool
 from sqlalchemy.engine import URL
 
@@ -13,9 +18,10 @@ from user_service.models.base import Model
 
 pytest_plugins = ["anyio"]
 
+
 @pytest.fixture(scope="session")
 def anyio_backend():
-    return "asyncio" 
+    return "asyncio"
 
 
 # Setup test database engine
@@ -23,16 +29,13 @@ def anyio_backend():
 def test_engine():
     DATABASE_URL = URL.create(
         drivername="postgresql+psycopg",
-        username=os.getenv('POSTGRES_USER'),
-        password=os.getenv('POSTGRES_PASSWORD'),
-        host=os.getenv('POSTGRES_HOST'),
-        port=os.getenv('POSTGRES_PORT'),
-        database=os.getenv('POSTGRES_DB'),
+        username=os.getenv("POSTGRES_USER"),
+        password=os.getenv("POSTGRES_PASSWORD"),
+        host=os.getenv("POSTGRES_HOST"),
+        port=os.getenv("POSTGRES_PORT"),
+        database=os.getenv("POSTGRES_DB"),
     )
-    engine = create_async_engine(
-        DATABASE_URL,
-        poolclass=NullPool
-    )
+    engine = create_async_engine(DATABASE_URL, poolclass=NullPool)
     return engine
 
 
@@ -41,7 +44,7 @@ def test_engine():
 async def setup_db(test_engine: AsyncEngine):
     async with test_engine.begin() as conn:
         await conn.run_sync(Model.metadata.create_all)
-    
+
     yield
 
     async with test_engine.begin() as conn:
@@ -60,7 +63,7 @@ async def db_session(test_engine: AsyncEngine, setup_db):
         bind=conn,
         class_=AsyncSession,
         expire_on_commit=False,
-        join_transaction_mode="create_savepoint"
+        join_transaction_mode="create_savepoint",  # data is not really saved in database so that tests are isolated
     )
 
     async with test_async_session() as session:
@@ -80,7 +83,9 @@ async def client(db_session: AsyncSession):
 
     app.dependency_overrides[get_db] = override_get_db
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as ac:
         yield ac
 
     app.dependency_overrides.clear()
