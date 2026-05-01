@@ -1,0 +1,29 @@
+services:
+  users_test_db:
+    image: postgres:15
+    env_file:
+      - user-service/.env.test
+    ports:
+      - "5433:5432" # use 5433 for the test database
+    tmpfs: # auto clean
+      - /var/lib/postgresql/data
+    restart: always
+  
+  users_test:
+    build: 
+      dockerfile: user-service/Dockerfile
+      context: .
+    env_file:
+      user-service/.env.test
+    depends_on:
+      - users_test_db
+    working_dir: /app/user-service
+    volumes:
+      - ./common:/app/common
+      - ./user-service:/app/user-service
+    command: >
+      sh -c "
+        ../wait-for-db.sh &&
+        alembic upgrade head &&
+        poetry run pytest -v
+      "

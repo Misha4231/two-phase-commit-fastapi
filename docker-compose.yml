@@ -1,0 +1,44 @@
+services:
+  users_service_db:
+    image: postgres
+    env_file:
+      user-service/.env
+    ports:
+      - "5434:5432"
+    volumes:
+      - users_postgres_data:/var/lib/postgresql
+    restart: always
+  
+  users_api:
+    build: 
+      dockerfile: user-service/Dockerfile
+      context: .
+    env_file:
+      user-service/.env
+    depends_on:
+      - user_service_db
+    ports:
+      - "8000:8000"
+    develop:
+      watch:
+        - path: ./user-service/user_service
+          action: rebuild
+          target: /app/user-service
+        
+        - path: ./common/common
+          action: rebuild
+          target: /app/common
+    working_dir: /app/user-service
+    volumes:
+      - ./common:/app/common
+      - ./user-service:/app/user-service
+      - ./user-service/migrations:/app/migrations
+      - ./user-service/migrations/versions:/app/migrations/versions
+    command: >
+      sh -c "
+        ../wait-for-db.sh &&
+        uvicorn user_service.main:app --host 0.0.0.0 --port 8000
+      "
+
+volumes:
+  users_postgres_data:

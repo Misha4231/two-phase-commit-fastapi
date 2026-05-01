@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.engine import URL
 
-from user_service.core.settings import settings
+from common.core.settings import settings
 
 DATABASE_URL = URL.create(
     drivername="postgresql+asyncpg",
@@ -14,18 +14,16 @@ DATABASE_URL = URL.create(
     port=settings.postgres_port,
     database=settings.postgres_db,
 )
-engine = create_async_engine(
-    DATABASE_URL,
-    isolation_level="REPEATABLE READ"
-)
+engine = create_async_engine(DATABASE_URL, isolation_level="REPEATABLE READ")
 
 AsyncSessionLocal = sessionmaker(
     autoflush=False,
     autocommit=False,
     expire_on_commit=False,
     bind=engine,
-    class_=AsyncSession
+    class_=AsyncSession,
 )
+
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
