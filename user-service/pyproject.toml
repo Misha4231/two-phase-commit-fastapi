@@ -22,7 +22,10 @@ pytest-mock = "^3.15.1"
 httpx = "^0.28.1"
 psycopg = "^3.3.3"
 anyio = "^4.13.0"
+common = "^0.1.1"
 
+[tool.poetry.group.local.dependencies]
+common = { path = "../common", develop = true }
 
 [build-system]
 requires = ["poetry-core"]

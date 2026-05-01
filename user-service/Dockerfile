@@ -4,8 +4,11 @@ WORKDIR /app
 
 RUN pip install --upgrade pip
 RUN pip install poetry
-COPY pyproject.toml poetry.lock* /app/
 
+COPY common /app/common
+COPY user-service/pyproject.toml user-service/poetry.lock* /app/user-service/
+
+WORKDIR /app/user-service
 RUN poetry config virtualenvs.create false && poetry install --no-root
 
 FROM python:3.12-slim
@@ -18,6 +21,9 @@ ENV PYTHONPATH=/app
 RUN apt-get update && apt-get install -y postgresql-client
 
 COPY --from=builder /usr/local /usr/local
-COPY . /app
+
+COPY wait-for-db.sh /app/wait-for-db.sh
+COPY common /app/common
+COPY user-service /app/user-service
 
 EXPOSE 8000

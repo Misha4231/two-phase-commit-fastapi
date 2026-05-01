@@ -2,8 +2,7 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, DateTime
 from sqlalchemy.sql import func
 
-Model = declarative_base()
-
+from common.models.base import Model
 
 class TimeStampedModel(Model):
     __abstract__ = True
