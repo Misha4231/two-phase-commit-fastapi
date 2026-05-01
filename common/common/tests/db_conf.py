@@ -1,5 +1,6 @@
 import os
 
+import pytest
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     create_async_engine,
@@ -11,8 +12,17 @@ from sqlalchemy.engine import URL
 
 from common.models.base import Model
 
+pytest_plugins = ["anyio"]
 
-def create_test_engine() -> AsyncEngine:
+
+@pytest.fixture(scope="session")
+def anyio_backend():
+    return "asyncio"
+
+
+# Setup test database engine
+@pytest.fixture(scope="session")
+def test_engine():
     DATABASE_URL = URL.create(
         drivername="postgresql+psycopg",
         username=os.getenv("POSTGRES_USER"),
@@ -21,33 +31,42 @@ def create_test_engine() -> AsyncEngine:
         port=os.getenv("POSTGRES_PORT"),
         database=os.getenv("POSTGRES_DB"),
     )
-    return create_async_engine(DATABASE_URL, poolclass=NullPool)
+    engine = create_async_engine(DATABASE_URL, poolclass=NullPool)
+    return engine
 
 
-async def setup_test_db(engine: AsyncEngine):
-    async with engine.begin() as conn:
+# Setup test database
+@pytest.fixture(scope="session")
+async def setup_db(test_engine: AsyncEngine):
+    async with test_engine.begin() as conn:
         await conn.run_sync(Model.metadata.create_all)
 
+    yield
 
-async def teardown_test_db(engine: AsyncEngine):
-    async with engine.begin() as conn:
+    async with test_engine.begin() as conn:
         await conn.run_sync(Model.metadata.drop_all)
-    await engine.dispose()
+
+    await test_engine.dispose()
 
 
-async def create_db_session(engine: AsyncEngine):
-    conn = await engine.connect()
+# Setup test database session
+@pytest.fixture
+async def db_session(test_engine: AsyncEngine, setup_db):
+    conn = await test_engine.connect()
     transaction = await conn.begin()
-    session_factory = async_sessionmaker(
+
+    test_async_session = async_sessionmaker(
         bind=conn,
         class_=AsyncSession,
         expire_on_commit=False,
-        join_transaction_mode="create_savepoint", # data is not really saved in database so that tests are isolated
+        join_transaction_mode="create_savepoint",  # data is not really saved in database so that tests are isolated
     )
-    return conn, transaction, session_factory()
 
+    async with test_async_session() as session:
+        try:
+            yield session
+        finally:
+            await session.close()
+            await transaction.rollback()
+            await conn.close()
 
-async def close_db_session(session: AsyncSession, transaction, conn):
-    await session.close()
-    await transaction.rollback()
-    await conn.close()
