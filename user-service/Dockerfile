@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y postgresql-client
 COPY --from=builder /usr/local /usr/local
 
 COPY wait-for-db.sh /app/wait-for-db.sh
-COPY common /app/common
-COPY user-service /app/user-service
+COPY common/ /app/common
+COPY user-service/ /app/user-service
 
 EXPOSE 8000

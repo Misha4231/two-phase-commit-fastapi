@@ -1,5 +1,5 @@
 services:
-  user_service_db:
+  users_service_db:
     image: postgres
     env_file:
       user-service/.env

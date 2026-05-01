@@ -27,6 +27,11 @@ common = "^0.1.1"
 [tool.poetry.group.local.dependencies]
 common = { path = "../common", develop = true }
 
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["..", "."]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
