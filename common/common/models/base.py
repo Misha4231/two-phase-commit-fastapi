@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 
 Model = declarative_base()
 
+
 class TimeStampedModel(Model):
     __abstract__ = True
 

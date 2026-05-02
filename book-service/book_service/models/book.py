@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, DECIMAL
 
 from common.models.base import TimeStampedModel
 
+
 class Book(TimeStampedModel):
     __tablename__ = "books"
 

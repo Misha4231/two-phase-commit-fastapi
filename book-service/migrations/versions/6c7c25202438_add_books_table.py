@@ -1,10 +1,11 @@
 """add books table
 
 Revision ID: 6c7c25202438
-Revises: 
+Revises:
 Create Date: 2026-05-02 10:04:01.550661
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
@@ -13,7 +14,7 @@ from sqlalchemy.sql import func
 
 
 # revision identifiers, used by Alembic.
-revision: str = '6c7c25202438'
+revision: str = "6c7c25202438"
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -22,7 +23,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.create_table(
-        "users",
+        "books",
         sa.Column("id", sa.Integer, primary_key=True, autoincrement=True, index=True),
         sa.Column("title", sa.String(100), nullable=False),
         sa.Column("author", sa.String(100), nullable=False),
@@ -40,4 +41,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table("users")
+    op.drop_table("books")
