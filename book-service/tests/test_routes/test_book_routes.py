@@ -4,7 +4,12 @@ from httpx import AsyncClient
 
 @pytest.mark.anyio
 async def test_route_create_book(client: AsyncClient):
-    new_book_data = {"title": "Dune", "author": "Frank Herbert", "stock": 10, "price": 29.99}
+    new_book_data = {
+        "title": "Dune",
+        "author": "Frank Herbert",
+        "stock": 10,
+        "price": 29.99,
+    }
     response = await client.post("/books/", json=new_book_data)
     data = response.json()
     assert response.status_code == 201
@@ -17,7 +22,12 @@ async def test_route_create_book(client: AsyncClient):
 
 @pytest.mark.anyio
 async def test_route_list_all_books(client: AsyncClient):
-    new_book_data = {"title": "Dune", "author": "Frank Herbert", "stock": 10, "price": 29.99}
+    new_book_data = {
+        "title": "Dune",
+        "author": "Frank Herbert",
+        "stock": 10,
+        "price": 29.99,
+    }
     await client.post("/books/", json=new_book_data)
     response = await client.get("/books/")
     data = response.json()
@@ -34,7 +44,12 @@ async def test_route_list_all_books(client: AsyncClient):
 
 @pytest.mark.anyio
 async def test_route_get_book_by_id(client: AsyncClient):
-    new_book_data = {"title": "1984", "author": "George Orwell", "stock": 5, "price": 14.99}
+    new_book_data = {
+        "title": "1984",
+        "author": "George Orwell",
+        "stock": 5,
+        "price": 14.99,
+    }
     create_response = await client.post("/books/", json=new_book_data)
     new_book = create_response.json()
     response = await client.get(f"/books/{new_book['id']}")
@@ -57,12 +72,22 @@ async def test_route_get_book_by_id_not_found(client: AsyncClient):
 
 @pytest.mark.anyio
 async def test_update_book(client: AsyncClient):
-    new_book_data = {"title": "Old Title", "author": "Old Author", "stock": 3, "price": 9.99}
+    new_book_data = {
+        "title": "Old Title",
+        "author": "Old Author",
+        "stock": 3,
+        "price": 9.99,
+    }
     create_response = await client.post("/books/", json=new_book_data)
     new_book = create_response.json()
     response = await client.put(
         f"/books/{new_book['id']}",
-        json={"title": "New Title", "author": "New Author", "stock": 99, "price": 49.99},
+        json={
+            "title": "New Title",
+            "author": "New Author",
+            "stock": 99,
+            "price": 49.99,
+        },
     )
     data = response.json()
     assert response.status_code == 200
@@ -80,7 +105,12 @@ async def test_update_book_not_found(client: AsyncClient):
 
 @pytest.mark.anyio
 async def test_delete_book(client: AsyncClient):
-    new_book_data = {"title": "Dune", "author": "Frank Herbert", "stock": 10, "price": 29.99}
+    new_book_data = {
+        "title": "Dune",
+        "author": "Frank Herbert",
+        "stock": 10,
+        "price": 29.99,
+    }
     create_response = await client.post("/books/", json=new_book_data)
     new_book = create_response.json()
     response = await client.delete(f"/books/{new_book['id']}")
@@ -106,7 +136,8 @@ async def test_create_book_invalid_payload(client: AsyncClient):
 @pytest.mark.anyio
 async def test_create_book_invalid_types(client: AsyncClient):
     response = await client.post(
-        "/books/", json={"title": 123, "author": "Author", "stock": "not-an-int", "price": "free"}
+        "/books/",
+        json={"title": 123, "author": "Author", "stock": "not-an-int", "price": "free"},
     )
     assert response.status_code == 422
 
@@ -116,7 +147,9 @@ async def test_update_partial_title(client: AsyncClient):
     new_book_data = {"title": "Original", "author": "Author", "stock": 5, "price": 9.99}
     create_response = await client.post("/books/", json=new_book_data)
     new_book = create_response.json()
-    response = await client.put(f"/books/{new_book['id']}", json={"title": "Updated Title"})
+    response = await client.put(
+        f"/books/{new_book['id']}", json={"title": "Updated Title"}
+    )
     data = response.json()
     assert data["title"] == "Updated Title"
     assert data["author"] == "Author"

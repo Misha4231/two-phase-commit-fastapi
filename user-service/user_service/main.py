@@ -1,5 +1,3 @@
-from fastapi import FastAPI
-
 from common.app import create_base_app
 from user_service.routes import users
 

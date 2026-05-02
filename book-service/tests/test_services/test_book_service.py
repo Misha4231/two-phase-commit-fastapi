@@ -102,9 +102,7 @@ async def test_update_book_partial_stock(db_session: AsyncSession):
     book = await book_service.create_book(
         BookCreate(title="Title", author="Author", stock=5, price=9.99), db_session
     )
-    updated = await book_service.update_book(
-        book.id, BookUpdate(stock=100), db_session
-    )
+    updated = await book_service.update_book(book.id, BookUpdate(stock=100), db_session)
     assert updated.title == "Title"
     assert updated.stock == 100
 
