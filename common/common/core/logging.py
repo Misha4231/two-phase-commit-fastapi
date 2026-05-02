@@ -2,6 +2,7 @@ import structlog
 
 from common.core.context import request_id_ctx_var
 
+
 def add_request_id(_, __, event_dict):
     event_dict["request_id"] = request_id_ctx_var.get()
     return event_dict

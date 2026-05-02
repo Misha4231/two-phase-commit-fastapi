@@ -9,6 +9,16 @@ services:
       - users_postgres_data:/var/lib/postgresql
     restart: always
   
+  books_service_db:
+    image: postgres
+    env_file:
+      book-service/.env
+    ports:
+      - "5435:5432"
+    volumes:
+      - books_postgres_data:/var/lib/postgresql
+    restart: always
+
   users_api:
     build: 
       dockerfile: user-service/Dockerfile
@@ -16,7 +26,7 @@ services:
     env_file:
       user-service/.env
     depends_on:
-      - user_service_db
+      - users_service_db
     ports:
       - "8000:8000"
     develop:
@@ -40,5 +50,37 @@ services:
         uvicorn user_service.main:app --host 0.0.0.0 --port 8000
       "
 
+  books_api:
+    build: 
+      dockerfile: book-service/Dockerfile
+      context: .
+    env_file:
+      book-service/.env
+    depends_on:
+      - books_service_db
+    ports:
+      - "8001:8000"
+    develop:
+      watch:
+        - path: ./book-service/book_service
+          action: rebuild
+          target: /app/book-service
+        
+        - path: ./common/common
+          action: rebuild
+          target: /app/common
+    working_dir: /app/book-service
+    volumes:
+      - ./common:/app/common
+      - ./book-service:/app/book-service
+      - ./book-service/migrations:/app/migrations
+      - ./book-service/migrations/versions:/app/migrations/versions
+    command: >
+      sh -c "
+        ../wait-for-db.sh &&
+        uvicorn book_service.main:app --host 0.0.0.0 --port 8000
+      "
+
 volumes:
   users_postgres_data:
+  books_postgres_data:

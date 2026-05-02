@@ -69,4 +69,3 @@ async def db_session(test_engine: AsyncEngine, setup_db):
             await session.close()
             await transaction.rollback()
             await conn.close()
-
