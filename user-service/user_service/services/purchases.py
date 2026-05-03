@@ -7,8 +7,7 @@ from user_service.core.logging import logger
 from user_service.models.user import User
 
 """
-Opens a database session, locks user row, validate balance.
-Session is stored in redis to make it shared across processes
+Opens a database session, locks user row, validate balance
 """
 async def prepare(transaction_id: str, user_id: int, amount: float, db: AsyncSession) -> PrepareResponse:
     logger.info("user_prepare_start", transaction_id=transaction_id, user_id=user_id)
@@ -57,12 +56,18 @@ async def commit(transaction_id: str, user_id: int, db: AsyncSession) -> UserCom
     raw = await db.connection()
     await raw.execute(text(f"COMMIT PREPARED '{transaction_id}'"))
     
+    logger.info("user_commit_success", transaction_id=transaction_id)
+
     # query updated user after commit
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalar_one()
-    return {"transaction_id": transaction_id, "remaning_balance": user.balance}
+
+    return UserCommitResponse(transaction_id=transaction_id, remaning_balance=user.balance)
 
 
 async def rollback(transaction_id: str, db: AsyncSession) -> None:
     raw = await db.connection()
     await raw.execute(text(f"ROLLBACK PREPARED '{transaction_id}'"))
+
+    logger.info("user_rollback_success", transaction_id=transaction_id)
+    return

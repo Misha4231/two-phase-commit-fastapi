@@ -30,7 +30,7 @@ class PrepareResponse(BaseModel):
     reason: str | None = None
 
 class BookPrepareResponse(PrepareResponse):
-    total_price: float
+    total_price: float | None = None
 
 class UserCommitResponse(BaseModel):
     transaction_id: str
