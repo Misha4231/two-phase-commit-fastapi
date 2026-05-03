@@ -12,8 +12,15 @@ class BookPrepareRequest(BaseModel):
     book_id: int
     quantity: int
 
+class UserCommitRequest(BaseModel):
+    user_id: str
+    transaction_id: str
 
-class CommitRollbackRequest(BaseModel):
+class BookCommitRequest(BaseModel):
+    book_id: str
+    transaction_id: str
+
+class RollbackRequest(BaseModel):
     transaction_id: str
 
 
@@ -22,6 +29,8 @@ class PrepareResponse(BaseModel):
     ready: bool
     reason: str | None = None
 
+class BookPrepareResponse(PrepareResponse):
+    total_price: float
 
 class UserCommitResponse(BaseModel):
     transaction_id: str

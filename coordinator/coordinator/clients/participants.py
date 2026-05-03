@@ -6,6 +6,7 @@ from common.schemas.purchase import (
     PrepareResponse,
     UserCommitResponse,
     BookCommitResponse,
+    BookPrepareResponse
 )
 
 # --------------- HELPER HTTP FUNCTIONS FOR PREPARE AND COMMIT -------------------
@@ -37,7 +38,7 @@ async def prepare_user(
 
 async def prepare_book(
     transaction_id: str, book_id: int, quantity: float
-) -> PrepareResponse:
+) -> BookPrepareResponse:
     logger.debug(
         "http_prepare_book",
         transaction_id=transaction_id,
@@ -56,27 +57,27 @@ async def prepare_book(
 
         response.raise_for_status()
 
-        return PrepareResponse.model_validate(response.json())
+        return BookPrepareResponse.model_validate(response.json())
 
 
-async def commit_user(transaction_id: str) -> UserCommitResponse:
+async def commit_user(transaction_id: str, user_id: int) -> UserCommitResponse:
     logger.debug("http_commit_user", transaction_id=transaction_id)
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{settings.user_service_url}/purchase/commit",
-            json={"transaction_id": transaction_id},
+            json={"transaction_id": transaction_id, "user_id": user_id},
         )
 
         response.raise_for_status()
         return UserCommitResponse.model_validate(response.json())
 
 
-async def commit_book(transaction_id: str) -> BookCommitResponse:
+async def commit_book(transaction_id: str, book_id: int) -> BookCommitResponse:
     logger.debug("http_commit_book", transaction_id=transaction_id)
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{settings.book_service_url}/purchase/commit",
-            json={"transaction_id": transaction_id},
+            json={"transaction_id": transaction_id, "book_id": book_id},
         )
 
         response.raise_for_status()

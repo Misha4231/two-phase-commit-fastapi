@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, DECIMAL, String
 
 from common.models.base import TimeStampedModel
 
@@ -8,4 +8,4 @@ class User(TimeStampedModel):
 
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     name = Column(String(100), nullable=False)
-    balance = Column(Integer, default=0)
+    balance = Column(DECIMAL(8, 2), default=0)

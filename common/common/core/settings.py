@@ -9,5 +9,9 @@ class Settings(BaseSettings):
     postgres_port: str
     postgres_db: str
 
+    redis_host: str
+    redis_password: str
+    redis_port: str
+
 
 settings = Settings()

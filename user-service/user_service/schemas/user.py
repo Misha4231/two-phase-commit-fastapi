@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 
 class UserCreate(BaseModel):
     name: str
-    balance: int
+    balance: float
 
 
 class UserUpdate(BaseModel):
@@ -16,7 +16,7 @@ class UserUpdate(BaseModel):
 class UserOut(BaseModel):
     id: int
     name: str
-    balance: int
+    balance: float
     created_at: datetime
     updated_at: datetime
 
