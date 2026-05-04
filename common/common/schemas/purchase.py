@@ -13,11 +13,11 @@ class BookPrepareRequest(BaseModel):
     quantity: int
 
 class UserCommitRequest(BaseModel):
-    user_id: str
+    user_id: int
     transaction_id: str
 
 class BookCommitRequest(BaseModel):
-    book_id: str
+    book_id: int
     transaction_id: str
 
 class RollbackRequest(BaseModel):

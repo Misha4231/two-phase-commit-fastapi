@@ -23,7 +23,7 @@ async def prepare_user(
     )
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"{settings.user_service_url}/purchase/prepare",
+            f"{settings.user_service_url}/purchases/prepare",
             json={
                 "transaction_id": transaction_id,
                 "user_id": user_id,
@@ -47,7 +47,7 @@ async def prepare_book(
     )
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"{settings.book_service_url}/purchase/prepare",
+            f"{settings.book_service_url}/purchases/prepare",
             json={
                 "transaction_id": transaction_id,
                 "book_id": book_id,
@@ -64,7 +64,7 @@ async def commit_user(transaction_id: str, user_id: int) -> UserCommitResponse:
     logger.debug("http_commit_user", transaction_id=transaction_id)
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"{settings.user_service_url}/purchase/commit",
+            f"{settings.user_service_url}/purchases/commit",
             json={"transaction_id": transaction_id, "user_id": user_id},
         )
 
@@ -76,7 +76,7 @@ async def commit_book(transaction_id: str, book_id: int) -> BookCommitResponse:
     logger.debug("http_commit_book", transaction_id=transaction_id)
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"{settings.book_service_url}/purchase/commit",
+            f"{settings.book_service_url}/purchases/commit",
             json={"transaction_id": transaction_id, "book_id": book_id},
         )
 
@@ -89,7 +89,7 @@ async def rollback_user(transaction_id: str) -> None:
     async with httpx.AsyncClient() as client:
         try:
             await client.post(
-                f"{settings.user_service_url}/purchase/rollback",
+                f"{settings.user_service_url}/purchases/rollback",
                 json={"transaction_id": transaction_id},
             )
         except Exception as e:
@@ -103,7 +103,7 @@ async def rollback_book(transaction_id: str) -> None:
     async with httpx.AsyncClient() as client:
         try:
             await client.post(
-                f"{settings.book_service_url}/purchase/rollback",
+                f"{settings.book_service_url}/purchases/rollback",
                 json={"transaction_id": transaction_id},
             )
         except Exception as e:

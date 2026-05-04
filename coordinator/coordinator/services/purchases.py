@@ -30,6 +30,9 @@ async def purchase(request: PurchaseRequest) -> PurchaseResponse:
         raise
 
     if not book_vote.ready:
+        # Book already prepared, must roll it back before surfacing the error
+        await http.rollback_book(transaction_id)
+
         logger.warning(
             "purchase_book_vote_no",
             transaction_id=transaction_id,
